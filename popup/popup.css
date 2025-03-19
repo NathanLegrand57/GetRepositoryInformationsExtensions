@@ -1,0 +1,26 @@
+body {
+    /* background-color: red; */
+    min-width: 200px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.url-container {
+    display: flex;
+    row-gap: 10px;
+}
+
+.url-item {
+    margin-left: 10px;
+}
+
+#paste-button:hover {
+    cursor: pointer;
+}
+
+#url {
+    text-decoration: none;
+    color: blue;
+}
