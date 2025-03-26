@@ -1,17 +1,12 @@
 function getUrl() {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    const urlElement = document.getElementById("url");
     const url = tabs[0].url;
-    // alert(url);
-    urlElement.textContent = url;
-    urlElement.href = url;
     const lastPart = url;
-    const website = lastPart.split("/")[2];
-    if (website === "github.com") {
-      // alert("You're on github");
-      getRepository(url);
-    } else {
+    if (!url.includes("github.com")) {
       alert("You're not on github website");
+      return;
+    } else {
+      getRepository(url);
     }
   });
 }
@@ -25,9 +20,10 @@ function getRepository(website) {
   const repositoryName = website.split("/")[4];
   if (repositoryName === undefined) {
     alert("Repository not found");
+    return;
   } else {
     fetchData(autorName, repositoryName);
-    alert("Repository: " + repositoryName);
+    console.log("Repository: " + repositoryName);
   }
 }
 
@@ -35,23 +31,31 @@ async function fetchData(autorName, repositoryName) {
   const url = `https://api.github.com/repos/${autorName}/${repositoryName}`;
   let data;
   try {
-    alert("gngng :" + url);
     const response = await fetch(url);
     data = await response.json();
   } catch (e) {
-    alert("Error", e);
+    console.log("Error", e);
+    setTimeout(() => window.close(), 100);
   }
 
-  const filteredValues = {
-    id: data.id,
-    name: data.name,
-    login: data.owner.login,
-    created_at: data.created_at,
-    visibility : data.private,
-  };
+  const dateFormatter = new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
 
-  console.log(
-    `This is the informations about the repository ${repositoryName} :`,
-    filteredValues
+  const createdDate = new Date(data.created_at);
+  const updatedDate = new Date(data.updated_at);
+
+  const formattedCreatedDate = dateFormatter.format(createdDate);
+  const formattedUpdatedDate = dateFormatter.format(updatedDate);
+
+  alert(
+    "Name : " +
+      data.name +
+      "\nCreated date : " +
+      formattedCreatedDate +
+      "\nLast time edited : " +
+      formattedUpdatedDate
   );
 }
